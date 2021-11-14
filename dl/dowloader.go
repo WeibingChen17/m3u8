@@ -17,7 +17,7 @@ import (
 const (
 	tsExt            = ".ts"
 	tsFolderName     = "ts"
-	mergeTSFilename  = "main.ts"
+	mergeTSFilename  = "target.ts"
 	tsTempFileSuffix = "_tmp"
 	progressWidth    = 40
 )
@@ -31,6 +31,7 @@ type Downloader struct {
 	segLen   int
 
 	result *parse.Result
+	Done   chan struct{}
 }
 
 // NewTask returns a Task instance
@@ -61,6 +62,7 @@ func NewTask(output string, url string) (*Downloader, error) {
 		folder:   folder,
 		tsFolder: tsFolder,
 		result:   result,
+		Done:     make(chan struct{}, 0),
 	}
 	d.segLen = len(result.M3u8.Segments)
 	d.queue = genSlice(d.segLen)
@@ -98,7 +100,12 @@ func (d *Downloader) Start(concurrency int) error {
 	if err := d.merge(); err != nil {
 		return err
 	}
+	close(d.Done)
 	return nil
+}
+
+func (d *Downloader) GetProgress() float32 {
+	return float32(d.finish) / float32(d.segLen) * 100
 }
 
 func (d *Downloader) download(segIndex int) error {
