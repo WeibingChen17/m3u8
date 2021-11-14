@@ -36,9 +36,6 @@ Windows PowerShell
 .\m3u8.exe -u="http://example.com/index.m3u8" -o="D:\data\example"
 ```
 
-## Download
-
-[Binary packages](https://github.com/oopsguy/m3u8/releases)
 
 ## Screenshots
 
